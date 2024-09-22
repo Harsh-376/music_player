@@ -4,15 +4,19 @@ const styles = createStyles({
   root: {
     display: "flex",
     flexDirection: "column",
-    overflowY: "auto",
     padding: "0.5rem",
+    height: "100%",
+    overflow: "hidden",
   },
   songContainer: {
+    overflowY: "auto",
     display: "flex",
     flexDirection: "column",
     height: "100%",
     width: "100%",
     gap: "0.5rem",
+    paddingBottom: "0.5rem",
+    paddingRight: "0.5rem",
   },
   songItem: {
     display: "flex",
@@ -23,6 +27,8 @@ const styles = createStyles({
     alignItems: "center",
     cursor: "pointer",
     justifyContent: "space-between",
+    minHeight: "4rem",
+    overflow: "hidden",
     "&:hover": {
       // backgroundColor: "#c0c0c0",
       backgroundColor: "#cdcdcd",
@@ -32,6 +38,7 @@ const styles = createStyles({
     display: "flex",
     gap: "0.5rem",
     alignItems: "flex-Start",
+    width: "100%",
   },
   songItemActive: {
     backgroundColor: "#ccc",
@@ -56,12 +63,14 @@ const styles = createStyles({
     flexDirection: "column",
     gap: "0.0625rem",
     height: "fit-content",
-    maxWidth: "16.875rem",
+    overflow: "hidden",
     "&>div": {
       display: "flex",
       gap: "0.25rem",
       alignItems: "flex-end",
       color: "#676767",
+      width: "100%",
+      overflow: "hidden",
       "&>p": {
         fontSize: "0.9375rem",
         textOverflow: "ellipsis",
@@ -72,8 +81,10 @@ const styles = createStyles({
     },
   },
   songItemActiveIcon: {
-    height: "3.5rem",
-    width: "3.5rem",
+    minHeight: "3.5rem",
+    maxHeight: "3.5rem",
+    minWidth: "3.5rem",
+    maxWidth: "3.5rem",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",

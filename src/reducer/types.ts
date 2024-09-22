@@ -1,15 +1,27 @@
-export type ReducerStateType = {
-  audioFiles: Array<{
-    title: string;
-    artist: string;
-    image: string;
-    audio: File | {}; // Remove empty object
-    active: boolean;
-    duration: string | null;
-  }>;
+export type audioType = {
+  title: string;
+  artist: string;
+  image: string;
+  audio: File | {};
+  duration: string | null;
+  uuid: string;
 };
 
-export type ReducerActionType = {
-  type: string;
-  payload: ReducerStateType["audioFiles"];
+export type ReducerStateType = {
+  audioFiles: Array<audioType>;
+  activeAudio: audioType | null;
 };
+
+export type ReducerActionType =
+  | {
+      type: "AddAudioFiles";
+      payload: ReducerStateType["audioFiles"];
+    }
+  | {
+      type: "SetActiveAudioFile";
+      payload: ReducerStateType["activeAudio"];
+    }
+  | {
+      type: "UpdateAudioFiles";
+      payload: ReducerStateType["audioFiles"];
+    };

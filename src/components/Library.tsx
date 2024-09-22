@@ -1,66 +1,38 @@
 import { makeStyles } from "@material-ui/styles";
-import { parseBlob } from "music-metadata";
+import clsx from "clsx";
 import React from "react";
+import AltImage from "../altImage.jpg";
 import { useCustomContext } from "../context";
+import { audioType } from "../reducer/types";
+import { parsedAudioFiles } from "../reducer/utils";
 import { styles } from "./Library.styles";
 import "./Library.styles.css";
-import clsx from "clsx";
 
 const useStyles = makeStyles(styles, {
   name: "Library",
   meta: "Library",
 });
 
-function secondsToHms(d: number) {
-  const h = Math.floor(d / 3600),
-    m = Math.floor((d % 3600) / 60),
-    s = Math.floor((d % 3600) % 60);
-
-  return (
-    (h > 0 ? h + "h " : "") + (m > 0 ? m + "m " : "") + (s > 0 ? s + "s" : "")
-  );
-}
-
 const Library = () => {
   const classes = useStyles();
   const {
-    state: { audioFiles },
+    state: { audioFiles, activeAudio },
     dispatch,
   } = useCustomContext();
 
   const onFileAdd = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files ? Array.from(e.target.files) : [];
-    if (files.length) {
-      const targetBackDrop = new CustomEvent("switchBackDrop", {
-        detail: { state: true },
+    const audioFiles = await parsedAudioFiles(
+      e.target.files ? Array.from(e.target.files) : []
+    );
+    if (audioFiles.length)
+      dispatch({
+        type: "AddAudioFiles",
+        payload: audioFiles,
       });
+  };
 
-      window.dispatchEvent(targetBackDrop);
-
-      const audioFiles = await Promise.all(
-        files.map(async (file, index) => {
-          const { common, format } = await parseBlob(file);
-          return {
-            title: common.title || "Unknown Music",
-            artist: common.artist || "Unknown Artist",
-            image: common.picture?.[0].data
-              ? URL.createObjectURL(
-                  new Blob([common.picture?.[0].data.buffer], {
-                    type: "image/png",
-                  })
-                )
-              : "",
-            audio: file,
-            active: index === 0,
-            duration: format.duration ? secondsToHms(format.duration) : null,
-          };
-        })
-      );
-      dispatch({ type: "UpdateAudioFiles", payload: audioFiles });
-
-      targetBackDrop.detail.state = false;
-      window.dispatchEvent(targetBackDrop);
-    }
+  const handleAudioChange = (audio: audioType) => {
+    dispatch({ type: "SetActiveAudioFile", payload: audio });
   };
 
   return (
@@ -80,12 +52,23 @@ const Library = () => {
               <div
                 key={`${el.artist}:${el.title}:${index}`}
                 className={clsx(classes.songItem, {
-                  [classes.songItemActive]: el.active,
+                  [classes.songItemActive]: el.uuid === activeAudio?.uuid,
                 })}
+                onClick={() => {
+                  handleAudioChange(el);
+                }}
               >
                 <div className={classes.songItemWrapper}>
                   <div className={classes.songImage}>
-                    <img src={el.image} alt="no-image" />
+                    {el.uuid === activeAudio?.uuid ? (
+                      <div className={classes.songItemActiveIcon}>
+                        <div id="songItemActiveIcon"></div>
+                      </div>
+                    ) : el.image ? (
+                      <img src={el.image} />
+                    ) : (
+                      <img src={AltImage} />
+                    )}
                   </div>
                   <div className={classes.songDetails}>
                     <div>
@@ -101,11 +84,6 @@ const Library = () => {
                     )}
                   </div>
                 </div>
-                {el.active && (
-                  <div className={classes.songItemActiveIcon}>
-                    <div id="songItemActiveIcon"></div>
-                  </div>
-                )}
               </div>
             ))
           : null}
